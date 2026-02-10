@@ -217,3 +217,17 @@ module.4/data/processed/docs/**/*
 module.4/data/raw/**/*
 !module.4/data/raw/.gitkeep
 !module.4/data/raw/README.md
+
+# --- Capstone data folders: keep dirs, ignore contents ---
+capstone/data/processed/chroma/**/*
+!capstone/data/processed/chroma/.gitkeep
+
+capstone/data/processed/docs/**/*
+!capstone/data/processed/docs/.gitkeep
+
+capstone/data/raw/**/*
+!capstone/data/raw/.gitkeep
+!capstone/data/raw/README.md
+
+capstone/logs/**/*
+!capstone/logs/.gitkeep

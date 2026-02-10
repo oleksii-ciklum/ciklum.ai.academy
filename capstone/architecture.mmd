@@ -1,0 +1,99 @@
+graph TD
+    subgraph CLI["CLI Interface (main.py)"]
+        USER[User Input]
+        CMDS["/help /quiz /summary /sources /eval /quit"]
+        OUTPUT[Colored Output + Logs]
+    end
+
+    subgraph AGENT["Agent Layer"]
+        LOOP["ReAct Loop<br/>(agent/loop.py)"]
+        PROMPTS["Prompt Templates<br/>(agent/prompts.py)"]
+        REFLECT["Self-Reflection<br/>(agent/reflection.py)"]
+        TOOLS["Tool Registry<br/>(agent/tools.py)"]
+    end
+
+    subgraph TOOL_SET["Agent Tools"]
+        T1["search_kb"]
+        T2["list_sources"]
+        T3["read_section"]
+        T4["generate_quiz"]
+        T5["summarize_topic"]
+        T6["evaluate_answer"]
+        T7["generate_post"]
+    end
+
+    subgraph RAG["RAG Layer"]
+        RETRIEVAL["Hybrid Retrieval<br/>(retrieval.py)"]
+        VEC["Vector Search<br/>(ChromaDB)"]
+        BM25["BM25 Lexical Search<br/>(bm25.py)"]
+        RERANK["Reranking<br/>(source bias + hybrid score)"]
+        EMBED["Embeddings<br/>(sentence-transformers)"]
+    end
+
+    subgraph LLM["LLM Layer"]
+        CLIENT["LLM Client<br/>(llm/client.py)"]
+        OLLAMA["Ollama<br/>(local)"]
+        OPENAI["OpenAI<br/>(optional)"]
+    end
+
+    subgraph DATA["Data Layer"]
+        PDF["PDF Extraction<br/>(PyMuPDF)"]
+        AUDIO["Audio Transcription<br/>(faster-whisper)"]
+        CHUNK["Text Chunking"]
+        CHROMA["ChromaDB<br/>(persistent storage)"]
+    end
+
+    subgraph EVAL["Evaluation"]
+        SUITE["Test Suite<br/>(3 questions)"]
+        KW["Keyword Scoring"]
+        JUDGE["LLM-as-Judge"]
+        LOGS["logs/eval_results.txt"]
+    end
+
+    USER --> LOOP
+    CMDS --> LOOP
+    LOOP --> PROMPTS
+    LOOP --> TOOLS
+    LOOP --> REFLECT
+    LOOP --> OUTPUT
+
+    TOOLS --> T1 & T2 & T3 & T4 & T5 & T6
+
+    T1 --> RETRIEVAL
+    T2 --> RETRIEVAL
+    T3 --> RETRIEVAL
+    T4 --> RETRIEVAL
+    T4 --> CLIENT
+    T5 --> RETRIEVAL
+    T5 --> CLIENT
+    T6 --> CLIENT
+    T7 --> CLIENT
+
+    RETRIEVAL --> VEC
+    RETRIEVAL --> BM25
+    RETRIEVAL --> RERANK
+    RETRIEVAL --> EMBED
+
+    VEC --> CHROMA
+    EMBED --> CHROMA
+
+    CLIENT --> OLLAMA
+    CLIENT --> OPENAI
+    REFLECT --> CLIENT
+
+    PDF --> CHUNK
+    AUDIO --> CHUNK
+    CHUNK --> EMBED
+    EMBED --> CHROMA
+
+    SUITE --> KW
+    SUITE --> JUDGE
+    KW --> LOGS
+    JUDGE --> LOGS
+
+    style CLI fill:#e1f5fe
+    style AGENT fill:#fff3e0
+    style RAG fill:#e8f5e9
+    style LLM fill:#fce4ec
+    style DATA fill:#f3e5f5
+    style EVAL fill:#fff9c4
